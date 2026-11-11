@@ -21,7 +21,7 @@ def check_tiktok():
     with yt_dlp.YoutubeDL({'extract_flat': 'in_playlist', 'quiet': True}) as ydl:
         info = ydl.extract_info(profile_url, download=False)
         if 'entries' not in info or not info['entries']:
-            return
+            return 
         
         latest = info['entries'][0]
         video_id = latest.get('id')
