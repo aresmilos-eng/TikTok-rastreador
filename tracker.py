@@ -6,7 +6,7 @@ BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 
 # ⚠️ REEMPLAZA esta variable con el usuario de TikTok que quieres rastrear (sin el @)
-TIKTOK_USER = ["yobp_", "abriil.Michel", "claudiaarcelemaitre", "mish_mend", "cloecarpino__", "pilita_castro", "lorenaqueiroz", "aurora_di_marco"]
+TIKTOK_USER = ["yobp_", "abriil.michel", "claudiaarcelemaitre", "mish_mend", "cloecarpino__", "pilita_castro", "lorenaqueiroz", "aurora_di_marco"]
 
 HISTORY_FILE = "ultimo_video.txt"
 
