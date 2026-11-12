@@ -1,4 +1,5 @@
 import os
+import json
 import requests
 import yt_dlp
 
@@ -10,16 +11,33 @@ TIKTOK_USERS = [
     "cloecarpino__", "pilita_castro", "lorenaqueiroz", "aurora_di_marco"
 ]
 
+HISTORY_FILE = "historial_videos.json"
+
 def send_telegram_video(video_path, caption):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendVideo"
     with open(video_path, "rb") as f:
         requests.post(url, data={"chat_id": CHAT_ID, "caption": caption}, files={"video": f})
 
+def cargar_historial():
+    if os.path.exists(HISTORY_FILE):
+        with open(HISTORY_FILE, "r") as f:
+            try:
+                return json.load(f)
+            except:
+                return {}
+    return {}
+
+def guardar_historial(historial):
+    with open(HISTORY_FILE, "w") as f:
+        json.dump(historial, f, indent=4)
+
 def check_accounts():
+    historial = cargar_historial()
+    hubo_cambios = False
+
     for username in TIKTOK_USERS:
         print(f"Revisando a: {username}")
         profile_url = f"https://www.tiktok.com/@{username}"
-        history_file = f"ultimo_video_{username}.txt"
         
         try:
             with yt_dlp.YoutubeDL({'extract_flat': 'in_playlist', 'quiet': True}) as ydl:
@@ -32,19 +50,16 @@ def check_accounts():
                 video_url = latest.get('url') or f"https://www.tiktok.com/@{username}/video/{video_id}"
                 title = latest.get('title', f'Nuevo video de @{username}')
 
-            # Si el archivo de historial no existe, es la primera vez que se escanea esta cuenta.
-            # Lo guardamos silenciosamente como referencia para NO spamear los videos viejos.
-            if not os.path.exists(history_file):
-                with open(history_file, "w") as f:
-                    f.write(video_id)
-                print(f"Historial inicializado para @{username} (ID: {video_id}). No se envía alerta de arranque.")
+            # Si la cuenta no está en el historial, la inicializamos sin spamear
+            if username not in historial:
+                historial[username] = video_id
+                print(f"Historial inicializado para @{username} (ID: {video_id})")
+                hubo_cambios = True
                 continue
 
-            # Leemos el último video registrado para esta cuenta específica
-            with open(history_file, "r") as f:
-                last_id = f.read().strip()
+            # Comparamos con el último video registrado para esta cuenta
+            last_id = historial[username]
 
-            # Si el ID actual es diferente al guardado, hay un video genuinamente nuevo
             if video_id != last_id:
                 print(f"¡Nuevo video encontrado para @{username}! Descargando...")
                 ydl_download_opts = {
@@ -57,14 +72,24 @@ def check_accounts():
 
                 send_telegram_video('downloaded_video.mp4', f"🚨 ¡Nuevo video de @{username}!\n\n{title}")
 
-                # Actualizamos el historial con el nuevo ID
-                with open(history_file, "w") as f:
-                    f.write(video_id)
+                # Actualizamos el registro con el nuevo ID
+                historial[username] = video_id
+                hubo_cambios = True
             else:
                 print(f"No hay videos nuevos para @{username}.")
 
         except Exception as e:
             print(f"Error al procesar a {username}: {e}")
+
+    # Guardamos los cambios en el archivo JSON local
+    if hubo_cambios:
+        guardar_historial(historial)
+        print("Actualizando archivo de historial en GitHub...")
+        os.system("git config --global user.name 'GitHub Actions Bot'")
+        os.system("git config --global user.email 'actions@github.com'")
+        os.system("git add historial_videos.json")
+        os.system("git commit -m 'Actualizar historial de TikTok [skip ci]'")
+        os.system("git push")
 
 if __name__ == "__main__":
     check_accounts()
