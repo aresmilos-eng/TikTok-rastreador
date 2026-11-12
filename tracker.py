@@ -18,7 +18,7 @@ def send_telegram_video(video_path, caption):
         requests.post(url, data={"chat_id": CHAT_ID, "caption": caption}, files={"video": f})
 
 def check_tiktok():
-    profile_url = f"https://www.tiktok.com/@{TIKTOK_USER}"
+    profile_url = f"https://www.tiktok.com/@{username}"
     
     with yt_dlp.YoutubeDL({'extract_flat': 'in_playlist', 'quiet': True}) as ydl:
         info = ydl.extract_info(profile_url, download=False)
@@ -27,7 +27,7 @@ def check_tiktok():
         
         latest = info['entries'][0]
         video_id = latest.get('id')
-        video_url = latest.get('url') or f"https://www.tiktok.com/@{TIKTOK_USER}/video/{video_id}"
+        video_url = latest.get('url') or f"https://www.tiktok.com/@{username}/video/{video_id}"
         title = latest.get('title', 'Nuevo video de TikTok')
 
     last_id = ""
