@@ -8,7 +8,7 @@ CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 
 TIKTOK_USERS = [
     "yobp_", "abriil.michel", "claudiaarcelemaitre", "mish_mend", 
-    "cloecarpino__", "pilita_castro", "lorenaqueiroz", "aurora_di_marco"
+    "cloecarpino__", "pilita_castro", "lorenaqueiroz", "aurora_di_marco", "jendii_Barbi"
 ]
 
 HISTORY_FILE = "historial_videos.json"
