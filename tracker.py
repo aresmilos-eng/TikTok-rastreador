@@ -38,7 +38,7 @@ def check_tiktok():
     if video_id != last_id:
         ydl_download_opts = {
             'outtmpl': 'downloaded_video.mp4',
-            'format': 'best[ext=mp4]/best',
+            'format': 'bestvideo+bestaudio/best',
         }
         with yt_dlp.YoutubeDL(ydl_download_opts) as ydl:
             ydl.download([video_url])
