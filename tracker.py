@@ -32,11 +32,19 @@ def check_accounts():
                 video_url = latest.get('url') or f"https://www.tiktok.com/@{username}/video/{video_id}"
                 title = latest.get('title', f'Nuevo video de @{username}')
 
-            last_id = ""
-            if os.path.exists(history_file):
-                with open(history_file, "r") as f:
-                    last_id = f.read().strip()
+            # Si el archivo de historial no existe, es la primera vez que se escanea esta cuenta.
+            # Lo guardamos silenciosamente como referencia para NO spamear los videos viejos.
+            if not os.path.exists(history_file):
+                with open(history_file, "w") as f:
+                    f.write(video_id)
+                print(f"Historial inicializado para @{username} (ID: {video_id}). No se envía alerta de arranque.")
+                continue
 
+            # Leemos el último video registrado para esta cuenta específica
+            with open(history_file, "r") as f:
+                last_id = f.read().strip()
+
+            # Si el ID actual es diferente al guardado, hay un video genuinamente nuevo
             if video_id != last_id:
                 print(f"¡Nuevo video encontrado para @{username}! Descargando...")
                 ydl_download_opts = {
@@ -49,8 +57,12 @@ def check_accounts():
 
                 send_telegram_video('downloaded_video.mp4', f"🚨 ¡Nuevo video de @{username}!\n\n{title}")
 
+                # Actualizamos el historial con el nuevo ID
                 with open(history_file, "w") as f:
                     f.write(video_id)
+            else:
+                print(f"No hay videos nuevos para @{username}.")
+
         except Exception as e:
             print(f"Error al procesar a {username}: {e}")
 
