@@ -1,5 +1,6 @@
 import os
 import json
+import time
 import requests
 import yt_dlp
 
@@ -8,7 +9,7 @@ CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 
 TIKTOK_USERS = [
     "yobp_", "abriil.michel", "claudiaarcelemaitre", "mish_mend", 
-    "cloecarpino__", "pilita_castro", "lorenaqueiroz", "aurora_di_marco", "jendii_Barbi"
+    "cloecarpino__", "pilita_castro", "lorenaqueiroz", "aurora_di_marco", "jendii_Barbii"
 ]
 
 HISTORY_FILE = "historial_videos.json"
@@ -71,6 +72,9 @@ def check_accounts():
                     ydl.download([video_url])
 
                 send_telegram_video('downloaded_video.mp4', f"🚨 ¡Nuevo video de @{username}!\n\n{title}")
+                
+                # PEQUEÑA PAUSA CLAVE: Esperamos 5 segundos para que Telegram procese bien el envío
+                time.sleep(5)
 
                 # Actualizamos el registro con el nuevo ID
                 historial[username] = video_id
