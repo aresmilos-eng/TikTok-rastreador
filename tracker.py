@@ -9,7 +9,7 @@ CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 
 TIKTOK_USERS = [
     "yobp_", "abriil.michel", "claudiaarcelemaitre", "mish_mend", 
-    "cloecarpino__", "pilita_castro", "lorenaqueiroz", "aurora_di_marco", "jendii_Barbii"
+    "cloecarpino__", "pilita_castro", "lorenaqueiroz", "aurora_di_marco", "jendii_barbii"
 ]
 
 HISTORY_FILE = "historial_videos.json"
@@ -63,17 +63,19 @@ def check_accounts():
 
             if video_id != last_id:
                 print(f"¡Nuevo video encontrado para @{username}! Descargando...")
+                
+                # Opciones optimizadas de descarga para mejor compatibilidad
                 ydl_download_opts = {
-                    'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+                    'format': 'best[ext=mp4]/best',
                     'outtmpl': 'downloaded_video.mp4',
-                    'merge_output_format': 'mp4',
                 }
+                
                 with yt_dlp.YoutubeDL(ydl_download_opts) as ydl:
                     ydl.download([video_url])
 
                 send_telegram_video('downloaded_video.mp4', f"🚨 ¡Nuevo video de @{username}!\n\n{title}")
                 
-                # PEQUEÑA PAUSA CLAVE: Esperamos 5 segundos para que Telegram procese bien el envío
+                # Pausa de 5 segundos para evitar saturar a Telegram en envíos múltiples
                 time.sleep(5)
 
                 # Actualizamos el registro con el nuevo ID
