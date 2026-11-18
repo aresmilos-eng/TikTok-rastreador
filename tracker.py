@@ -78,11 +78,13 @@ def check_accounts():
                     video_url = entry.get('url') or f"https://www.tiktok.com/@{username}/video/{video_id}"
                     title = entry.get('title', f'Nuevo video de @{username}')
 
-                    print(f"Descargando video ID {video_id} de @{username}...")
+                    print(f"Descargando video ID {video_id} de @{username} en máxima calidad...")
                     
+                    # Opciones restauradas a máxima calidad HD combinando video y audio
                     ydl_download_opts = {
-                        'format': 'best[ext=mp4]/best',
+                        'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
                         'outtmpl': 'downloaded_video.mp4',
+                        'merge_output_format': 'mp4',
                     }
                     
                     with yt_dlp.YoutubeDL(ydl_download_opts) as ydl:
@@ -109,7 +111,7 @@ def check_accounts():
         os.system("git config --global user.name 'GitHub Actions Bot'")
         os.system("git config --global user.email 'actions@github.com'")
         os.system("git add historial_videos.json")
-        os.system("git commit -m 'Actualizar historial multi-video de TikTok [skip ci]'")
+        os.system("git commit -m 'Actualizar historial multi-video en HD [skip ci]'")
         os.system("git push")
 
 if __name__ == "__main__":
